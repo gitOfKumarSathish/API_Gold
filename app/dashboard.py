@@ -24,8 +24,13 @@ def dashboard(db: Session = Depends(get_db)):
         completed = db.query(models.Customers).filter(
             models.Customers.status == "completed").count()
 
-        if customers == 0:
-            raise HTTPException(status_code=404, detail="No customers found")
+        if not customers:
+            {
+                "total": 0,
+                "due_date": 0,
+                "pending": 0,
+                "completed": 0
+            }
 
         return {
             "total": customers,

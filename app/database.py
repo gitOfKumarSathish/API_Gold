@@ -3,7 +3,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 SQLITE_DATABASE_URL = "sqlite:///./gold.db"
 
-engine = create_engine(SQLITE_DATABASE_URL, echo=True, connect_args={"check_same_thread": False})
+engine = create_engine(SQLITE_DATABASE_URL, echo=False,
+                       connect_args={"check_same_thread": False})
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -14,5 +15,6 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 Base = declarative_base()

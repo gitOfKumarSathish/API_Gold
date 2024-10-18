@@ -15,7 +15,8 @@ class UserOut(BaseModel):
     password: str
 
     class Config:
-        orm_mode = True  # This is important to convert SQLAlchemy objects to Pydantic models
+        # This is important to convert SQLAlchemy objects to Pydantic models
+        from_attributes = True
 
 
 class CurrentAmountEntry(BaseModel):
@@ -43,7 +44,7 @@ class PaymentEntry(BaseModel):
     date: str  # Date is a string in the payment history (ISO format)
 
     class Config:
-        orm_mode = True  # This enables conversion from ORM models
+        from_attributes = True  # This enables conversion from ORM models
 
 
 class CustomerOut(BaseModel):
@@ -55,7 +56,6 @@ class CustomerOut(BaseModel):
     item_weight: int
     amount: int
     pending: int
-    current_amount: int
     payment_history: str | List
     start_date: date
     end_date: date

@@ -24,7 +24,6 @@ def add_customers(
     item_weight: int = Form(...),
     amount: int = Form(...),
     pending: int = Form(...),
-    current_amount: int = Form(...),
     start_date: str = Form(...),
     end_date: str = Form(...),
     note: str = Form(...),
@@ -46,11 +45,10 @@ def add_customers(
             item_weight=item_weight,
             amount=amount,
             pending=pending,
-            current_amount=current_amount,
             start_date=start_date,
             end_date=end_date,
             note=note,
-            image=image_path
+            image="/" + image_path
         )
 
         db.add(new_customer)
@@ -65,7 +63,7 @@ def add_customers(
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail="Application Number must be unique. Integrity error occurred.")
+            status_code=400, detail=f"{e}")
 
     except SQLAlchemyError as e:
         db.rollback()
@@ -167,6 +165,8 @@ def update_customer(
         customer.status = status
 
         if current_amount:
+            print("Current amount: ", current_amount)
+            print("payment history: ", customer.payment_history)
             payment_history = json.loads(
                 customer.payment_history) if customer.payment_history else []
 
@@ -184,6 +184,7 @@ def update_customer(
             customer.pending = new_pending
 
             customer.payment_history = json.dumps(payment_history)
+            print("payment history: ", customer.payment_history)
 
         customer.app_no = app_no
         customer.username = username
@@ -191,7 +192,6 @@ def update_customer(
         customer.ph_no = ph_no
         customer.item_weight = item_weight
         customer.amount = amount
-        customer.current_amount = current_amount
         customer.start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
         customer.end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
         customer.note = note
@@ -206,17 +206,17 @@ def update_customer(
             with open(image_path, "wb") as image_file:
                 image_file.write(image.file.read())
 
-            customer.image = image_path
+            customer.image = "/" + image_path
 
-            db.commit()
-            db.refresh(customer)
+        db.commit()
+        db.refresh(customer)
 
         return customer
 
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail="Application Number must be unique. Integrity error occurred.")
+            status_code=400, detail=f"error: {e}")
 
     except SQLAlchemyError as e:
         db.rollback()
