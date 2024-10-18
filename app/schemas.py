@@ -1,11 +1,13 @@
 from pydantic import BaseModel
-from typing import Optional,List
+from typing import Optional, List
 from datetime import date
 import base64
+
 
 class UserCreate(BaseModel):
     username: str
     password: str
+
 
 class UserOut(BaseModel):
     id: Optional[str]  # Optional because it will be generated if not provided
@@ -15,10 +17,12 @@ class UserOut(BaseModel):
     class Config:
         orm_mode = True  # This is important to convert SQLAlchemy objects to Pydantic models
 
+
 class CurrentAmountEntry(BaseModel):
     id: int
     payment_amount: int
     date: date
+
 
 class CustomerCreate(BaseModel):
     app_no: int
@@ -28,12 +32,10 @@ class CustomerCreate(BaseModel):
     item_weight: int
     amount: int
     pending: int
-    current_amount: int 
+    current_amount: int
     start_date: str
     end_date: str
     note: str
-
-
 
 
 class PaymentEntry(BaseModel):
@@ -42,6 +44,7 @@ class PaymentEntry(BaseModel):
 
     class Config:
         orm_mode = True  # This enables conversion from ORM models
+
 
 class CustomerOut(BaseModel):
     id: Optional[str]

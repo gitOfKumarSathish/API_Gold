@@ -1,6 +1,7 @@
 __pycache__/
+.venv
+.vscode/
 .git/
 gold.db
 check.py
-app/__pycache__/
 images/
