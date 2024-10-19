@@ -6,17 +6,11 @@ from enum import Enum as PyEnum
 Base = declarative_base()
 
 
-class Users(Base):
+class User(Base):
     __tablename__ = "users"
-
-    id = Column(String(36), primary_key=True, default=lambda: str(
-        uuid.uuid4()))  # UUID as string for non-PostgreSQL
-    # Username should be unique, not primary key
-    username = Column(String, nullable=False, unique=True)
-    password = Column(String, nullable=False)
-
-    class Config:
-        from_attributes = True
+    email = Column(String, primary_key=True, index=True)
+    secret_key = Column(String, nullable=False)
+    uri = Column(String, nullable=False)
 
 
 class StatusEnum(PyEnum):

@@ -9,6 +9,8 @@ from fastapi.responses import JSONResponse
 from typing import List
 from . import models
 from . import schemas
+# Assuming you have this function in auth module
+from .auth import get_current_user
 
 router = APIRouter()
 
@@ -28,7 +30,8 @@ def add_customers(
     end_date: str = Form(...),
     note: str = Form(...),
     image: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
     try:
         start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
@@ -75,7 +78,7 @@ def add_customers(
 
 
 @router.get("/customers", response_model=list[schemas.CustomerOut])
-def get_customers(db: Session = Depends(get_db)):
+def get_customers(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     try:
         customers = db.query(models.Customers).all()
 
@@ -94,7 +97,7 @@ def get_customers(db: Session = Depends(get_db)):
 
 
 @router.get("/customers/{customer_id}", response_model=schemas.CustomerOut)
-def get_customer(customer_id: str, db: Session = Depends(get_db)):
+def get_customer(customer_id: str, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     try:
         customer = db.query(models.Customers).filter(
             models.Customers.app_no == customer_id).first()
@@ -114,7 +117,7 @@ def get_customer(customer_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/filter/{number}", response_model=list[schemas.CustomerOut])
-def get_customers_by_ph_no(number: str, db: Session = Depends(get_db)):
+def get_customers_by_ph_no(number: str, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     try:
         details = db.query(models.Customers).filter(
             models.Customers.ph_no == number).all()
@@ -150,7 +153,8 @@ def update_customer(
     note: str = Form(...),
     status: str = Form(...),
     image: UploadFile = File(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
     try:
         customer = db.query(models.Customers).filter(

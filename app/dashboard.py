@@ -8,13 +8,14 @@ from .database import get_db
 from datetime import datetime
 from . import models
 from . import schemas
-
+# Assuming you have a get_current_user function in auth module
+from .auth import get_current_user
 
 router = APIRouter()
 
 
 @router.get("/dashboard")
-def dashboard(db: Session = Depends(get_db)):
+def dashboard(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     try:
         customers = db.query(models.Customers).count()
         due_date = db.query(models.Customers).filter(
@@ -25,7 +26,7 @@ def dashboard(db: Session = Depends(get_db)):
             models.Customers.status == "completed").count()
 
         if not customers:
-            {
+            return {
                 "total": 0,
                 "due_date": 0,
                 "pending": 0,
@@ -52,9 +53,8 @@ def dashboard(db: Session = Depends(get_db)):
     #     raise HTTPException(status_code=500, detail=str(e))
 
 
-# Use list as the response model for multiple customers
 @router.get("/due_customers", response_model=list[schemas.CustomerOut])
-def due_customers(db: Session = Depends(get_db)):
+def due_customers(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     try:
         customers = db.query(models.Customers).filter(models.Customers.end_date < datetime.now(
         ).date()).all()  # Use .all() to get all matching customers
@@ -78,9 +78,8 @@ def due_customers(db: Session = Depends(get_db)):
         return JSONResponse(content={"msg": e}, status_code=500)
 
 
-# Use list as the response model for multiple customers
 @router.get("/pending_customers", response_model=list[schemas.CustomerOut])
-def pending_customers(db: Session = Depends(get_db)):
+def pending_customers(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     try:
         customers = db.query(models.Customers).filter(
             models.Customers.status == "pending").all()  # Use .all() to get all matching customers
@@ -104,9 +103,8 @@ def pending_customers(db: Session = Depends(get_db)):
         return JSONResponse(content={"msg": e}, status_code=500)
 
 
-# Use list as the response model for multiple customers
 @router.get("/completed_customers", response_model=list[schemas.CustomerOut])
-def completed_customers(db: Session = Depends(get_db)):
+def completed_customers(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     try:
         customers = db.query(models.Customers).filter(
             models.Customers.status == "completed").all()  # Use .all() to get all matching customers
